@@ -1,0 +1,6 @@
+hi DiffAdd      ctermfg=Black    ctermbg=Green
+hi DiffChange   ctermfg=Black    ctermbg=NONE
+hi DiffDelete   ctermfg=Black    ctermbg=Red
+hi DiffText     ctermfg=Black    ctermbg=Red
+hi Folded       ctermfg=Black    ctermbg=White
+
