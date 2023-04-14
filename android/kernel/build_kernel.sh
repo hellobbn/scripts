@@ -9,7 +9,6 @@ print_help() {
     echo "Options:"
     echo "  -c, --clang-path      Specify clang path for LLVM tools and compiler"
     echo "  -d, --defconfig       Specify defconfig to use"
-    echo "  -g, --gcc-path        (Deprecated) Specify gcc path for binutils"
     echo ""
     echo "Commands:"
     echo "  -b, --bear            Use \`bear\` to generate a compdb"
@@ -37,9 +36,8 @@ if [ ! -d ./out ]; then
 fi
 
 # Default value
-GCC_PATH=/data/LineageOS/LineageOS_20/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
+# GCC_PATH=/data/LineageOS/LineageOS_20/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
 CLANG_PATH=/data/LineageOS/LineageOS_20/prebuilts/clang/host/linux-x86/clang-r450784d/bin
-BUILD_CROSS_COMPILE=${GCC_PATH}/aarch64-linux-android-
 DEFCONFIG=pdx215_defconfig
 GEN_DEFCONFIG=0
 NO_BUILD=0
@@ -69,12 +67,6 @@ while [[ $# -gt 0 ]]; do
         -d|--defconfig)
             # Specify defconfig to use
             DEFCONFIG="$2"
-            shift
-            shift
-            ;;
-        -g|--gcc-path)
-            # Specify GCC path for binutils (May not be useful though)
-            GCC_PATH="$2"
             shift
             shift
             ;;
@@ -121,9 +113,7 @@ if [[ $CLEAN -eq 1 ]]; then
     rm -rf $OUT
 fi
 BUILD_WRAPPER=(make -j28 -C "$(pwd)" O="$(pwd)"/"$OUT" ARCH=arm64
-                LLVM=1 LLVM_IAS=1
-                CC=clang CLANG_TRIPLE=aarch64-linux-gnu-
-                CROSS_COMPILE="$BUILD_CROSS_COMPILE")
+                LLVM=1 LLVM_IAS=1)
 
 if [[ $USE_BEAR -eq 1 ]]; then
     BEAR_EXEC="bear -- "

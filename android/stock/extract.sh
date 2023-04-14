@@ -56,6 +56,7 @@ for i in "${partitions[@]}"; do
     mkdir -p rootfs/"$i"
     sudo cp -ra mnt/* rootfs/"$i"
     sudo chown -R bbn:bbn rootfs/"$i"
+    sync
     sudo umount mnt
 done
 
@@ -82,6 +83,7 @@ mv "$oem_img" oem.img
 mkdir rootfs/oem
 sudo mount -o ro oem.img mnt
 sudo cp -ra mnt/* rootfs/oem
+sync
 sudo umount mnt
 
 sudo rm -rf oem_*.img
