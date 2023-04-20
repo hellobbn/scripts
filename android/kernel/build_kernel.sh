@@ -8,6 +8,7 @@ print_help() {
     echo ""
     echo "Options:"
     echo "  -c, --clang-path      Specify clang path for LLVM tools and compiler"
+    echo "  -g, --gcc-path        Specify gcc tool path, only used if -u is set"
     echo "  -d, --defconfig       Specify defconfig to use"
     echo ""
     echo "Commands:"
@@ -16,6 +17,7 @@ print_help() {
     echo "  -G, --gen-defconfig   Also generate a defconfig in out/defconfig"
     echo "  -n, --no-build        Stop right before building"
     echo "  -N, --nconfig         Run \`make nconfig\` before building"
+    echo "  -u, --use-gcc         Use gcc, for 4.19 kernel"
     echo "                        This will automatically select -G"
     echo "  -h, --help            Print this help message and exit"
     echo ""
@@ -36,7 +38,7 @@ if [ ! -d ./out ]; then
 fi
 
 # Default value
-# GCC_PATH=/data/LineageOS/LineageOS_20/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
+GCC_PATH=/data/LineageOS/LineageOS_20/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
 CLANG_PATH=/data/LineageOS/LineageOS_20/prebuilts/clang/host/linux-x86/clang-r450784d/bin
 DEFCONFIG=pdx215_defconfig
 GEN_DEFCONFIG=0
@@ -70,6 +72,12 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        -g|--gcc-path)
+            # Specify gcc tool path
+            GCC_PATH="$2"
+            shift
+            shift
+            ;;
         -G|--gen-defconfig)
             # Also generate a defconfig in $OUT/defconfig
             GEN_DEFCONFIG=1
@@ -92,6 +100,11 @@ while [[ $# -gt 0 ]]; do
             GEN_DEFCONFIG=1
             shift
             ;;
+        -u|--use-gcc)
+            # Use gcc
+            USE_GCC=1
+            shift
+            ;;
         --)
             # Specify arguments to run, and exit
             MORE_ARG=1
@@ -112,8 +125,14 @@ done
 if [[ $CLEAN -eq 1 ]]; then
     rm -rf $OUT
 fi
+
+if [[ $USE_GCC -eq 1 ]]; then
+    BUILD_CROSS_COMPILE=${GCC_PATH}/aarch64-linux-android-
+    CROSS_COMPILE_CMD=(CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE="$BUILD_CROSS_COMPILE")
+fi
+
 BUILD_WRAPPER=(make -j28 -C "$(pwd)" O="$(pwd)"/"$OUT" ARCH=arm64
-                LLVM=1 LLVM_IAS=1)
+                LLVM=1 LLVM_IAS=1 "${CROSS_COMPILE_CMD[@]}" )
 
 if [[ $USE_BEAR -eq 1 ]]; then
     BEAR_EXEC="bear -- "
