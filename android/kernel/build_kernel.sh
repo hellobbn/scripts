@@ -19,6 +19,7 @@ print_help() {
     echo "  -N, --nconfig         Run \`make nconfig\` before building"
     echo "  -u, --use-gcc         Use gcc, for 4.19 kernel"
     echo "                        This will automatically select -G"
+    echo "  -t, --build-dtbo      Also build dtbo"
     echo "  -h, --help            Print this help message and exit"
     echo ""
     echo "* Arguments right after -- will make the script to run ARGS one by one separated by space and exit"
@@ -105,6 +106,11 @@ while [[ $# -gt 0 ]]; do
             USE_GCC=1
             shift
             ;;
+        -t|--build-dtbo)
+            # Build DTBO
+            BUILD_DTBO=1
+            shift
+            ;;
         --)
             # Specify arguments to run, and exit
             MORE_ARG=1
@@ -167,4 +173,8 @@ fi
 
 if [[ $NO_BUILD -eq 0 ]]; then
     $BEAR_EXEC "${BUILD_WRAPPER[@]}" 2>&1 | tee build.txt
+fi
+
+if [[ $BUILD_DTBO -eq 1 ]]; then
+    mkdtboimg create "$(pwd)"/"$OUT"/dtbo.img "$(find "$OUT"/arch/arm64/boot/dts -name "*.dtbo")"
 fi
