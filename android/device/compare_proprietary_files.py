@@ -57,11 +57,9 @@ sec_dict_base = []
 
 create_dict(file_1, sec_dict_1)
 
-i = 0
-for base_file in base_files:
+for idx, base_file in enumerate(base_files):
     sec_dict_base.append({})
-    create_dict(base_file, sec_dict_base[i])
-    i += 1
+    create_dict(base_file, sec_dict_base[idx])
 
 for k, v in sec_dict_1.items():
     found = False
@@ -84,11 +82,10 @@ for val in cat_dict["match"]:
     print(val + ": \033[92m" + sec_dict_1[val] + "\033[0m")
 
 print("Mismatched:")
-i = 0;
-for val in cat_dict["mismatch"]:
+for idx, val in enumerate(cat_dict["mismatch"]):
     print(val + ": \033[93m" + sec_dict_1[val] +
-          "\033[0m expect: \033[93m" + cat_dict["should_be"][i] + "\033[0m")
-    sec_dict_1[val] = cat_dict["should_be"][i]
+          "\033[0m expect: \033[93m" + cat_dict["should_be"][idx] + "\033[0m")
+    sec_dict_1[val] = cat_dict["should_be"][idx]
 
 print("Not found:")
 for val in cat_dict["not_found"]:
