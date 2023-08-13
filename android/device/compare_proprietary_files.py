@@ -11,6 +11,11 @@ def create_dict(file, sec_dict):
             line = line.split("|")[0].strip()
             if line:
                 if line[0] != '#':
+                    if line[0] == '-':
+                        line = line[1:]
+                    # replace first odm with vendor
+                    if line[0:3] == "odm":
+                        line = "vendor" + line[3:]
                     if section == None:
                         print("Section not found")
                         sys.exit(1)
@@ -37,6 +42,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("in_file", help="The proprietary file to compare")
 parser.add_argument("base_files", nargs="+", help="The base files to compare")
 parser.add_argument('-o', '--output', default="output.txt", help="The output file")
+parser.add_argument('-n', '--no-write', action="store_true", help="Don't write to the output file")
 
 args = parser.parse_args()
 
@@ -93,15 +99,16 @@ for val in cat_dict["not_found"]:
 
 output_dict = invert_dict(sec_dict_1)
 
-# Output the sorted keys
-output_file = args.output
-keys = list(output_dict.keys())
-keys.sort()
-with open(output_file, 'w') as f:
-    for k in keys:
-        print("# " + k, file=f)
-        values = list(output_dict[k])
-        values.sort()
-        for v in values:
-            print(v, file=f)
-        print("", file=f)
+if not args.no_write:
+    # Output the sorted keys
+    output_file = args.output
+    keys = list(output_dict.keys())
+    keys.sort()
+    with open(output_file, 'w') as f:
+        for k in keys:
+            print("# " + k, file=f)
+            values = list(output_dict[k])
+            values.sort()
+            for v in values:
+                print(v, file=f)
+            print("", file=f)
