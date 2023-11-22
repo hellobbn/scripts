@@ -41,7 +41,7 @@ fi
 # Default value
 GCC_PATH=/data/LineageOS/LineageOS_20/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin
 CLANG_PATH=/data/LineageOS/LineageOS_20/prebuilts/clang/host/linux-x86/clang-r450784d/bin
-DEFCONFIG=pdx215_defconfig
+DEFCONFIG=(pdx215_defconfig)
 GEN_DEFCONFIG=0
 NO_BUILD=0
 USE_BEAR=0
@@ -69,7 +69,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -d|--defconfig)
             # Specify defconfig to use
-            DEFCONFIG="$2"
+            read -ra DEFCONFIG <<< "$2"
             shift
             shift
             ;;
@@ -161,7 +161,7 @@ if [[ $MORE_ARG -eq 1 ]]; then
 fi
 
 # Default build procedure
-"${BUILD_WRAPPER[@]}" "$DEFCONFIG"
+"${BUILD_WRAPPER[@]}" "${DEFCONFIG[@]}"
 
 if [[ $NCONFIG -eq 1 ]]; then
     "${BUILD_WRAPPER[@]}" nconfig
