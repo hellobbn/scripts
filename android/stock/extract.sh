@@ -11,7 +11,6 @@ if [[ $# -ne 1 ]]; then
     print_help $0
 fi
 
-
 FIRMWARE_DIR=$1
 
 pushd "$FIRMWARE_DIR" || exit
@@ -40,10 +39,37 @@ unsin "$super_sin"
 mv "$super_img" super_unsined.img
 
 set +e
-read -r -d '\n' -a partitions < <(imjtool super_unsined.img 2>&1 | grep "Name" | cut -d ' ' -f 2 | grep "_a" | sed -e 's/_a//')
+
+read -r -d '\n' -a partitions < <(python - <<-EOF
+import json
+import sys
+import subprocess
+
+super_img = 'super_unsined.img'
+
+output = subprocess.check_output(["lpdump", "-j", super_img]).decode()
+
+j = json.loads(output)
+partitions = j['partitions']
+
+raw_partitions = []
+
+for p in partitions:
+    pname = p['name']
+    if pname[-2:] == "_a" or pname[-2:] == "_b":
+        pname = pname[:-2]
+        if pname not in raw_partitions:
+            raw_partitions.append(pname)
+
+for p in raw_partitions:
+    print(p)
+EOF
+)
+
 set -e
 
-imjtool super_unsined.img extract
+mkdir -p extracted
+lpunpack super_unsined.img extracted
 pushd extracted || exit
 rm -rf ./*_b.img
 rename _a "" ./*
@@ -89,3 +115,9 @@ sudo umount mnt
 sudo rm -rf oem_*.img
 sudo rm -rf mnt
 
+popd || exit
+
+# Replace space with _
+NEW_DIR="${FIRMWARE_DIR// /_}"
+mv "$FIRMWARE_DIR" "$NEW_DIR"
+echo "Extracted to $NEW_DIR"
