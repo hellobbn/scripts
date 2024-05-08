@@ -10,8 +10,14 @@ else
   build_device=$1
 fi
 
+if [[ -z $2 ]]; then
+  build_type=userdebug
+else
+  build_type=$2
+fi
+
 echo "Building for $build_device"
-build_target="lineage_${build_device}-userdebug"
+build_target="lineage_${build_device}-${build_type}"
 
 # pushd ./device/sony/pdx203
 # ./extract-files.sh /data/LineageOS/rootfs_58.2.A.7.93/rootfs
@@ -20,7 +26,8 @@ build_target="lineage_${build_device}-userdebug"
 . build/envsetup.sh
 # m clobber
 # rm -rf out
-lunch $build_target
+breakfast $build_device
+# lunch "$build_target"
 # m installclean
 # m bootimage
 # m

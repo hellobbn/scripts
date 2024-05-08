@@ -18,13 +18,20 @@ while read -r line; do
     source_value=$(echo "$line" | cut -d '=' -f 2)
 
     # Get the target value
-    target_value=$(grep "^$source_key=" "$2" | cut -d '=' -f 2)
+    target_value=$(grep "^$source_key=" "$2" | cut -d '=' -f 2 | head -n 1)
+
+    # if the key contains lineage, skip it
+    if [[ "$source_key" == *lineage* ]]; then
+        continue
+    fi
+
     if [ -z "$target_value" ]; then
         # Print missing in yellow
-        echo -e "\033[0;33mMissing: \033[0m$source_key: $source_value"
+        echo -e "\033[0;33mMissing: \033[0m$source_key=$source_value"
         continue
     elif [ "$source_value" != "$target_value" ]; then
         # Print mismatch in red
         echo -e "\033[0;31mMismatch: \033[0m$source_key: $source_value != $target_value"
+        continue
     fi
 done < "$1"
