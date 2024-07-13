@@ -103,6 +103,9 @@ if [[ ${#oem_sins[@]} -ne 1 ]]; then
 fi
 oem_sin=${oem_sins[0]}
 oem_img="${oem_sin//.sin/.ext4}"
+if [[ ! -f "$oem_img" ]]; then
+    oem_img="${oem_sin//.sin/.img}"
+fi
 
 unsin "$oem_sin"
 mv "$oem_img" oem.img

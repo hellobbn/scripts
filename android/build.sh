@@ -2,7 +2,11 @@
 
 export USE_CCACHE=1
 export CCACHE_EXEC=/usr/bin/ccache
-export CCACHE_DIR=/data/.ccache
+if [[ -z $CCACHE_DIR ]]; then
+  export CCACHE_DIR=/data/.ccache
+fi
+
+echo "CCACHE DIR is $CCACHE_DIR"
 
 if [[ -z $1 ]]; then
   build_device=kebab
