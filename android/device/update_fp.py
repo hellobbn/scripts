@@ -47,9 +47,11 @@ def do_replaceline(file, line_no, value):
     with open(file, 'w') as f:
         f.writelines(lines)
 
-def commit_changes(dir, show_change_stat=False):
+def commit_changes(dir, prefix: str, show_change_stat=False):
+    if prefix[-1] != ':':
+        prefix += ':'
     try:
-        subprocess.check_output(['git', 'commit', '-a', '-m', 'Update blobs to ' + base_name ], cwd=dir)
+        subprocess.check_output(['git', 'commit', '-a', '-m', prefix + ' Update blobs to ' + base_name ], cwd=dir)
     except subprocess.CalledProcessError as _:
         print('No changes in %s, skipping commit' % dir)
 
@@ -140,7 +142,7 @@ do_replaceline(prop_files_file, 0, '# Stock package version: ' + base_name + '\n
 
 # Git commit
 print('Committing changes...')
-commit_changes(device_dir)
+commit_changes(device_dir, device_name)
 
 # Now, replace things in common
 common_dir = lineageos_dir + '/device/' + manufacture_name + '/' + common_name + '/'
@@ -157,7 +159,7 @@ do_replaceline(prop_files_file, 0, '# Stock package version: ' + base_name + '\n
 
 # Git commit
 print('Committing changes...')
-commit_changes(common_dir)
+commit_changes(common_dir, common_name)
 
 if not args.extract:
     exit(0)
@@ -169,7 +171,7 @@ print('Running extract-files.sh...')
 subprocess.check_output(['./extract-files.sh', rootdir + 'super'], cwd=device_dir)
 
 vendor_dir = lineageos_dir + '/vendor/' + manufacture_name + '/' + device_name + '/'
-commit_changes(vendor_dir, True)
+commit_changes(vendor_dir, device_name, True)
 
 vendor_dir = lineageos_dir + '/vendor/' + manufacture_name + '/' + common_name + '/'
-commit_changes(vendor_dir, True)
+commit_changes(vendor_dir, common_name, True)
