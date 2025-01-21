@@ -21,16 +21,16 @@ else
 fi
 
 echo "Building for $build_device"
-build_target="lineage_${build_device}-${build_type}"
 
 # pushd ./device/sony/pdx203
 # ./extract-files.sh /data/LineageOS/rootfs_58.2.A.7.93/rootfs
 # popd
 
 . build/envsetup.sh
+source vendor/lineage/vars/aosp_target_release
 # m clobber
 # rm -rf out
-breakfast $build_device
+lunch lineage_${build_device}-${aosp_target_release}-${build_type}
 # lunch "$build_target"
 # m installclean
 # m bootimage
